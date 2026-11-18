@@ -1454,7 +1454,6 @@ new MutationObserver(blLang).observe(document.documentElement,{attributes:true,a
 
 })();
 
-document.querySelectorAll('a[data-tg]').forEach(a=>a.addEventListener('click',e=>{const u=a.dataset.tg;if(/iPhone|iPad|Android/i.test(navigator.userAgent)){e.preventDefault();const t0=Date.now();location.href='tg://resolve?domain='+u;setTimeout(()=>{if(!document.hidden&&Date.now()-t0<2500)location.href='https://t.me/'+u},1200)}else{e.preventDefault();window.open('https://t.me/'+u,'_blank','noopener')}}));
 </script>
 </body>
 </html>
