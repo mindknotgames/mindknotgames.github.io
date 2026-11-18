@@ -1097,8 +1097,8 @@ let lastS=performance.now();
   else SC.cur=SC.tgt=scrollY;
   if((SC.anim||wheelMode)&&Math.abs(SC.cur-scrollY)>.4){driving=true;scrollTo(0,SC.cur);driving=false}
   // logo scatter plays as a timed animation, it never stops half-way
-  const leaving=(SC.anim?SC.anim.to:SC.cur)>innerHeight*.3?1:0;
-  SCAT+=Math.sign(leaving-SCAT)*Math.min(Math.abs(leaving-SCAT),dt/.9);
+  const leaving=(SC.anim?SC.anim.to:SC.cur)>(wheelMode?innerHeight*.3:30)?1:0;
+  SCAT+=Math.sign(leaving-SCAT)*Math.min(Math.abs(leaving-SCAT),dt/(wheelMode?.9:.45));
   SCATE=easeIO(SCAT);
   requestAnimationFrame(scrollLoop)})(performance.now());
 // header + hero buttons jump to sections smoothly
