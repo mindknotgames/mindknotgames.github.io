@@ -499,7 +499,7 @@
 #tBl .menu div:hover{background:#0001}
 @keyframes bpop{from{transform:scale(.85);opacity:0}}
 #tBl .hint{position:absolute;left:0;right:0;bottom:24px;text-align:center;font:12px ui-monospace,Menlo,monospace;color:#ffffff60;letter-spacing:.2em;z-index:5;transition:opacity .3s}
-#tBl .row{padding-top:120px}@media (max-width:860px){#tBl .row{flex-direction:column;gap:18px;padding-top:110px}#tBl .slot{--y:0px!important}}
+#tBl .row{padding-top:120px}@media (max-width:860px){#tBl .row{flex-direction:column;gap:18px;padding-top:110px}#tBl .slot{--y:0px!important;position:absolute;left:50%;top:calc(50% + 40px);margin-left:calc(var(--c)*-8);margin-top:calc(var(--c)*-12);transition:transform .45s cubic-bezier(.3,1.3,.5,1)}#tBl .slot.out{transform:translateX(120vw) rotate(25deg)!important}}
 #tBl .track{}#tBl{position:relative;height:300vh;z-index:3}#tBl .sticky{position:sticky;top:0;height:100vh;overflow:hidden}#tBl .bttl{position:absolute;left:max(32px,calc(50% - 558px));top:12vh;z-index:5;margin:0}
 @media(max-width:860px){#tBl .bttl{top:9vh;left:20px}}
 #tBl .bdot svg{width:60%!important;height:auto!important;display:block}
@@ -563,7 +563,7 @@
 </div>
 <span id="blog"></span><div id="tBl"><div class="sticky">
   <h2 class="ttl bttl"><span class="tag">03</span><span data-i="blog">Блог</span></h2>
-  <canvas id="bcv"></canvas><div class="row" id="brow"></div><p class="hint" id="bhint">↓</p>
+  <canvas id="bcv"></canvas><div class="row" id="brow"></div><p class="hint" id="bhint">↓</p><p class="hint" id="bswipe" style="opacity:0">← свайпай →</p>
 </div></div>
 <section class="sec hi" id="contact">
   <div id="hiSpot"></div>
@@ -1412,8 +1412,12 @@ const slots=[],cards=SHOW.map((p,i)=>{const sl=document.createElement('div');sl.
     el.style.transform=`rotateX(${(.5-y)*16}deg) rotateY(${(x-.5)*18}deg) scale(1.03)`;el.style.setProperty('--mx',x*100+'%');el.style.setProperty('--my',y*100+'%');el.style.setProperty('--hp',x*360)});
   el.addEventListener('pointerleave',()=>{el.style.transform=''});
   return el});
+let order=[0,1,2];function stack(){if(innerWidth>=860){slots.forEach(s=>s.style.zIndex='');return}order.forEach((k,i)=>{slots[k].style.zIndex=10-i})}stack();addEventListener('resize',stack);
+slots.forEach((sl,k)=>{let x0=null,moved=false;sl.addEventListener('pointerdown',e=>{if(innerWidth<860){x0=e.clientX;moved=false}});sl.addEventListener('pointermove',e=>{if(x0!==null&&Math.abs(e.clientX-x0)>40)moved=true});
+ sl.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50&&order[0]===k){sl.classList.add('out');setTimeout(()=>{order.push(order.shift());stack();sl.classList.remove('out')},300)}});
+ sl.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false}},true)});
 addEventListener('click',()=>document.querySelectorAll('.menu.on').forEach(m=>m.classList.remove('on')));
-let C=20,cubes=null;function layout(){const mob=innerWidth<860;C=mob?Math.floor(Math.min(innerWidth*.6/16,(innerHeight-180)/(24*3+2))):Math.floor(Math.min(innerWidth*.26/16,(innerHeight-200)/24));
+let C=20,cubes=null;function layout(){const mob=innerWidth<860;C=mob?Math.floor(Math.min(innerWidth*.84/16,(innerHeight-190)/24)):Math.floor(Math.min(innerWidth*.26/16,(innerHeight-200)/24));
   row.style.setProperty('--c',C+'px');row.style.setProperty('--gap',Math.round(C*(mob?.6:2))+'px');cubes=null}
 layout();addEventListener('resize',layout);
 const BG='#1d1a2b',PL='#2a2638',WH='#e9e7f0';
@@ -1427,13 +1431,13 @@ function build(){cubes=[];const sr=cv.getBoundingClientRect();
       if(j>=21&&j<=22&&i>=1&&i<=14){col=PL;if(j===22){if(i===2)col='#FF5A5F';if(i===5||i===7)col='#fff';if(i===13)col='#fff'}}
       if((i===0||i===15)&&(j===0||j===23))continue;
       const lx=(i+.5-8)*C,ly=(j+.5-12)*C,tx=cx+lx*co-ly*si,ty=cy+lx*si+ly*co,ang=Math.random()*6.283,d=Math.hypot(sr.width,sr.height)*(.6+Math.random()*.4);
-      cubes.push({tx,ty,ta:a,sx:sr.width/2+Math.cos(ang)*d,sy:sr.height/2+Math.sin(ang)*d,rot:(Math.random()-.5)*6,col,r:k*.12+Math.random()*.45})}})}
+      cubes.push({tx,ty,ta:a,sx:sr.width/2+Math.cos(ang)*d,sy:sr.height/2+Math.sin(ang)*d,rot:(Math.random()-.5)*6,col,k,r:k*.12+Math.random()*.45})}})}
 function fit(c){const d=Math.min(devicePixelRatio,2),w=c.clientWidth,h=c.clientHeight;if(c.width!==Math.round(w*d)){c.width=Math.round(w*d);c.height=Math.round(h*d)}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);return[g,w,h]}
 let q=0,lt=0;
 (function loop(now){try{const dt=Math.min(.05,(now-lt)/1000)||.016;lt=now;const p=bprog(track);q+=(p-q)*Math.min(1,dt*5);if(!Number.isFinite(q))q=0;
-  const asm=clamp_(q/.75),ready=asm>=.995;cards.forEach(c=>{c.classList.toggle('ready',ready);if(!ready)c.classList.remove('flip')});hint.style.opacity=asm>.05?0:1;
+  const asm=clamp_(q/.75),ready=asm>=.995;cards.forEach(c=>{c.classList.toggle('ready',ready);if(!ready)c.classList.remove('flip')});hint.style.opacity=asm>.05?0:1;const bs=document.getElementById('bswipe');bs.style.opacity=(ready&&innerWidth<860)?1:0;
   const[g,w,h]=fit(cv);g.clearRect(0,0,w,h);
-  if(!ready){if(!cubes)build();for(const c of cubes){const t=eio((asm-c.r)/.45);if(asm<.02)continue;const x=c.sx+(c.tx-c.sx)*t,y=c.sy+(c.ty-c.sy)*t,gap=(1-t)*C*.18,s=C-gap*2+.6;
+  if(!ready){if(!cubes){build();if(innerWidth<860){const rank=k=>order.indexOf(k);cubes.sort((a,b)=>rank(b.k)-rank(a.k))}}for(const c of cubes){const t=eio((asm-c.r)/.45);if(asm<.02)continue;const x=c.sx+(c.tx-c.sx)*t,y=c.sy+(c.ty-c.sy)*t,gap=(1-t)*C*.18,s=C-gap*2+.6;
       g.save();g.translate(x,y);g.rotate(c.rot*(1-t)+c.ta*t);if(t<.98){g.fillStyle='#000';g.fillRect(-s/2,-s/2+C*.12*(1-t),s,s)}g.fillStyle=c.col;g.fillRect(-s/2,-s/2,s,s);g.restore()}}
   }catch(e){}requestAnimationFrame(loop)})(0);
 addEventListener('scroll',()=>{if(bprog(track)<.03)cubes=null},{passive:true});
