@@ -503,6 +503,7 @@
 #tBl .track{}#tBl{position:relative;height:300vh;z-index:3}#tBl .sticky{position:sticky;top:0;height:100vh;overflow:hidden}#tBl .bttl{position:absolute;left:max(32px,calc(50% - 558px));top:12vh;z-index:5;margin:0}
 @media(max-width:860px){#tBl .bttl{top:9vh;left:20px}}
 #tBl .bdot svg{width:60%!important;height:auto!important;display:block}
+@media (max-width:860px){.sticky,#tBl .sticky{height:100svh!important}}
 </style>
 </head>
 <body>
@@ -578,7 +579,8 @@
   <p class="foot">© 2026 Mindknot Games</p>
 </section>
 
-<script>
+<script>(function(){const add=window.addEventListener.bind(window);window.addEventListener=function(t,f,o){if(t!=='resize')return add(t,f,o);let lw=innerWidth;const g=e=>{if(matchMedia('(pointer:coarse)').matches&&innerWidth===lw)return;lw=innerWidth;f(e)};return add(t,g,o)};})();
+
 const PAL=["#FF5A5F","#FFB400","#2EC4B6","#7B61FF"];
 const HINTS=["СМАХНИ ПО ЛОГО БЫСТРО · ХВАТАЙ И БРОСАЙ ПИКСЕЛИ",
              "ХВАТАЙ И ТЯНИ — ЛОГО КАК ЖЕЛЕ",
@@ -1085,14 +1087,15 @@ addEventListener('wheel',e=>{
 addEventListener('keydown',e=>{const g=secTop('games');
   if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();if(SC.cur<g-4)goTo(g);else SC.tgt=Math.min(maxY(),SC.tgt+innerHeight*.6)}
   if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();if(SC.cur<=g+4)goTo(0);else SC.tgt=Math.max(g,SC.tgt-innerHeight*.6)}});
-let driving=false;
+let driving=false,wheelMode=false;addEventListener('wheel',()=>wheelMode=true,{passive:true});addEventListener('keydown',()=>wheelMode=true);addEventListener('touchstart',()=>{wheelMode=false;SC.anim=null},{passive:true});
 addEventListener('scroll',()=>{if(!driving&&Math.abs(scrollY-SC.cur)>3){SC.cur=SC.tgt=scrollY;SC.anim=null}},{passive:true});
 let lastS=performance.now();
 (function scrollLoop(now){
   const dt=Math.min(.05,(now-lastS)/1000);lastS=now;
   if(SC.anim){const p=Math.min(1,(now-SC.anim.t0)/SC.anim.d);SC.cur=SC.anim.from+(SC.anim.to-SC.anim.from)*easeIO(p);if(p>=1){SC.cur=SC.tgt=SC.anim.to;SC.anim=null}}
-  else SC.cur+=(SC.tgt-SC.cur)*Math.min(1,dt*6);
-  if(Math.abs(SC.cur-scrollY)>.4){driving=true;scrollTo(0,SC.cur);driving=false}
+  else if(wheelMode)SC.cur+=(SC.tgt-SC.cur)*Math.min(1,dt*6);
+  else SC.cur=SC.tgt=scrollY;
+  if((SC.anim||wheelMode)&&Math.abs(SC.cur-scrollY)>.4){driving=true;scrollTo(0,SC.cur);driving=false}
   // logo scatter plays as a timed animation, it never stops half-way
   const leaving=(SC.anim?SC.anim.to:SC.cur)>innerHeight*.3?1:0;
   SCAT+=Math.sign(leaving-SCAT)*Math.min(Math.abs(leaving-SCAT),dt/.9);
