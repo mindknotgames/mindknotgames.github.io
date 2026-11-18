@@ -569,10 +569,10 @@
 <section class="sec hi" id="contact">
   <div id="hiSpot"></div>
   <p class="sub rv" data-i="contact_sub">Есть идея, вопрос или хочешь в бету «Эха»? Пиши — отвечаем быстро.</p>
-  <div class="cta rv"><a class="pk cta mag big" href="mailto:hello@mindknot.games" style="--k:#FFB400"><span class="tx">✉ hello@mindknot.games</span></a><a class="pk mag big" href="https://t.me/mindknot" target="_blank" rel="noopener" style="--k:#2EC4B6"><span class="tx">Telegram</span></a></div>
+  <div class="cta rv"><a class="pk cta mag big" href="mailto:hello@mindknot.games" style="--k:#FFB400"><span class="tx">✉ hello@mindknot.games</span></a><a class="pk mag big" href="https://t.me/mindknot" data-tg="mindknot" style="--k:#2EC4B6"><span class="tx">Telegram</span></a></div>
   <div class="cinfo">
     <div class="ci rv"><em data-i="c1">Почта</em><b>hello@mindknot.games</b></div>
-    <div class="ci rv"><em data-i="c2">Telegram</em><b><a href="https://t.me/mindknot" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">@mindknot</a></b></div>
+    <div class="ci rv"><em data-i="c2">Telegram</em><b><a href="https://t.me/mindknot" data-tg="mindknot" style="color:inherit;text-decoration:none">@mindknot</a></b></div>
     <div class="ci rv"><em data-i="c3">Пресса и партнёрство</em><b>press@mindknot.games</b></div>
     <div class="ci rv"><em data-i="c4">Где мы</em><b data-i="c4v">Одесса, Украина</b></div>
   </div>
@@ -1453,6 +1453,8 @@ function blLang(){const l=document.documentElement.lang==='uk'?'ua':(BL[document
 new MutationObserver(blLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});blLang();
 
 })();
+
+document.querySelectorAll('a[data-tg]').forEach(a=>a.addEventListener('click',e=>{const u=a.dataset.tg;if(/iPhone|iPad|Android/i.test(navigator.userAgent)){e.preventDefault();const t0=Date.now();location.href='tg://resolve?domain='+u;setTimeout(()=>{if(!document.hidden&&Date.now()-t0<2500)location.href='https://t.me/'+u},1200)}else{e.preventDefault();window.open('https://t.me/'+u,'_blank','noopener')}}));
 </script>
 </body>
 </html>
