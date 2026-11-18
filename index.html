@@ -653,6 +653,7 @@ function resetMode(hard){
 }
 MODE=3;document.getElementById('hint').textContent='';
 addEventListener('resize',build);
+(function(){let key=()=>innerWidth+'x'+devicePixelRatio,k=key(),n=0;const chk=()=>{if(key()!==k){k=key();build()}};const iv=setInterval(()=>{chk();if(++n>20)clearInterval(iv)},300);addEventListener('load',()=>setTimeout(()=>{k='';chk()},200));addEventListener('pageshow',()=>{k='';chk()});try{matchMedia('(resolution: '+devicePixelRatio+'dppx)').addEventListener('change',()=>{k='';chk()})}catch(e){}})();
 
 /* ---------- input ---------- */
 const nearestTile=(px,py,R)=>{let best=null,bd=R;for(const t of tiles){const d=Math.hypot(t.x-px,t.y-py);if(d<bd){bd=d;best=t}}return best};
